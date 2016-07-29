@@ -1,0 +1,131 @@
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include <windows.h> 
+/************用户信息结构体****************/
+struct user{
+	char name[10];
+	int win,lose,ping,jwin;
+}u;
+/*************************主函数*******************************/
+int main()
+{
+	system("title 剪刀石头布竞赛");
+	system("mode con cols=60 lines=30");
+	system("color F3");
+	int com,user;                                                 /*com:电脑，user:玩家*/ 
+	int n,i,t;                                                    /*n:总人数。i:循环变量*/ 
+	int win,lose,ping,jwin,total;                                 /*赢局数，输局数，平局数，净赢数，总局数*/ 
+	void judge(int *pwin,int *plose,int *pping,int *pjwin);       /*判断函数声明*/
+	struct user u[100];                                           /*定义结构体数组u*/
+	struct user input_user();                                     /*输入计算函数声明*/ 
+	void sort_user(struct user u[],int n);                        /*排行榜函数声明*/
+	void output_user(struct user u[],int n); 
+	t=1;
+	while(t==1){
+		printf("欢迎参加剪刀石头布竞赛\n");
+		printf("请选择游戏模式：\n1.练习模式(三局两胜)\n2.实名对战模式(三局两胜)\n");
+		scanf("%d",&i);	
+		system("cls");
+		switch(i){
+		case 1:{
+			printf("练习模式\n");
+			judge(&win,&lose,&ping,&jwin);         
+			total=win+lose+ping;
+			printf("\n");
+			printf("玩家信息：赢%d局，输%d局，平%d局，净赢%d局,共玩%d局\n",win,lose,ping,jwin,total);
+			printf("练习结束\n");
+			break;
+			   }
+		case 2:{
+			printf("实名对战模式\n");
+			printf("请输入玩家数量：\n");
+			scanf("%d",&n);
+			for(i=0;i<n;i++){
+				printf("\n请输入第%d玩家名称：\n",i+1);
+				u[i]=input_user();
+				judge(&win,&lose,&ping,&jwin);
+				u[i].win=win;u[i].lose=lose;u[i].ping=ping;u[i].jwin=jwin;
+			}sort_user(u,n);                                                         
+			system("cls");
+			printf("\n玩家排行榜\n");
+			output_user(u,n); 
+			break;
+			   }
+		}
+		printf("是否继续？\n1.yes\n2.no\n");
+		scanf("%d",&t);
+		printf("%d",t);
+		system("cls");
+	}
+
+}
+/*************用户信息输入函数定义******************/
+struct user input_user()
+{
+	struct user u;
+	printf("姓名:");
+	scanf("%s",&u.name);
+	return u;
+};
+/*************判断输赢的函数定义****************/
+void judge(int *pwin,int *plose,int *pping,int *pjwin)
+{
+	int lose=0,win=0,ping=0,jwin=0;
+	int com;
+    int result; 
+	int user;
+	do{
+		printf("请出拳(1.剪刀、2.石头、3.布):");
+		scanf("%d",&user);
+		switch (user){
+		        case 1:user=4;break;
+		        case 2:user=7;break;
+	        	case 3:user=10;break;
+		}
+		srand((unsigned)time(NULL));
+		com=rand()%3;
+		result=user+com;
+		printf("电脑出了");
+		switch (com){
+		case 0:printf("剪刀\n");break;
+		case 1:printf("石头\n");break;
+		case 2:printf("布\n");break;
+		}
+		printf("你出了");
+		switch (user){
+		case 4:printf("剪刀\n");break;
+		case 7:printf("石头\n");break;
+        case 10:printf("布\n");break;
+		}
+		switch (result){
+		case 6:case 7:case 11:printf("你赢了!");win=win+1;break;
+		case 5:case 9:case 10:printf("电脑赢了!");lose=lose+1;break;
+		default:printf("平手");break;
+		}
+	} while(!(win==2||lose==2));
+	jwin=win-lose;
+	*pwin=win;*plose=lose;*pping=ping;*pjwin=jwin;
+}
+/******************排序函数*******************/
+void sort_user(struct user u[],int n)
+{
+	int i,j,index;
+	struct user temp;
+	for(i=0;i<n-1;i++)
+	{
+		index=i;
+		for(j=1;j<n;j++) if(u[j].jwin>u[index].jwin) index=j;
+		temp=u[i];u[i]=u[index];u[index]=temp;
+	}
+}
+/*************排行榜输出函数定义****************/
+void output_user(struct user u[],int n)
+{
+	int i;
+	printf("名称  赢局数  输局数  平局数  净赢局数\n");
+	for(i=0;i<n;i++)
+	{
+		printf("%-10s%-3d%-3d%-3d%-3d\n",u[i].name,u[i].win,u[i].lose,u[i].ping,u[i].jwin);
+	}
+}
